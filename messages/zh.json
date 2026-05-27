@@ -1,9 +1,9 @@
 {
   "Metadata": {
-    "title": "IMGPrompt - AI绘画提示词生成器 | Nano Banana/GPT-image-2/Midjourney/FLUX/Seedance/Veo/Kling 提示词助手",
-    "description": "AI 图像/视频提示词卡壳？IMGPrompt 可视化点选，秒出 Nano Banana/GPT-image-2/Midjourney/FLUX/Seedance/Veo/Kling 专业咒语。浏览器本地运行，免登录。",
-    "ogTitle": "IMGPrompt - 一键生成AI绘画提示词",
-    "ogDescription": "告别死背提示词！点选双语标签，秒出 Nano Banana/GPT-image-2/Midjourney/FLUX/Seedance/Veo/Kling 的 AI 图像/视频专业咒语。浏览器本地运行，免登录。",
+    "title": "IMGPrompt - 免费可视化 AI 绘画提示词词典",
+    "description": "免费开源 AI 提示词词典。点选中英双语标签，秒出 Midjourney、FLUX、Veo 等模型的图像/视频提示词。浏览器本地运行，无需登录。",
+    "ogTitle": "IMGPrompt - 中文 AI 绘画提示词词典",
+    "ogDescription": "点选双语标签，秒出 Midjourney、FLUX、Veo 等 AI 图像/视频提示词。免费、本地、无需登录。",
     "ogUrl": "https://prompt.newzone.top/app/zh",
     "ogSiteName": "IMGPrompt",
     "ogLogo": "https://prompt.newzone.top/app/logo.png",
@@ -67,38 +67,8 @@
     "placeholder": "请留言，无需登录（填写邮箱可获回复提醒）"
   },
   "Home": {
-    "h1": "IMGPrompt · AI 绘画提示词生成器",
-    "tagline": "告别死背提示词。点选可视化标签，秒出 AI 图像/视频专业提示词 —— 支持 Nano Banana、GPT-image-2、Midjourney、FLUX、Seedance、Veo、Kling 等主流模型。"
-  },
-  "About": {
-    "title": "关于 IMGPrompt",
-    "intro1": "IMGPrompt 是一款免费、开源的可视化提示词编辑器，覆盖 AI 图像与视频生成，官方适配 Nano Banana、GPT-image-2、Midjourney、FLUX、Seedance、Veo、Kling 等主流模型（也兼容 Stable Diffusion、DALL·E 等语法）。通过可视化的标签选择和中英双语显示，你可以快速组合出高质量的英文提示词，不必再死记硬背英文关键词。",
-    "intro2": "工具完全在浏览器本地运行，不依赖任何后端数据库，也不会把你的创作内容上传到服务器。无需注册、无需付费、开源可审。除网页版外还提供 Windows、macOS 和 Linux 桌面客户端，所有功能离线可用。"
-  },
-  "HowTo": {
-    "title": "三步生成专业提示词",
-    "step1": {
-      "title": "选择主体（Subject）",
-      "desc": "从左侧主体列表中选定你想绘制的对象类别，如人物、动物、风景、建筑、概念艺术等。这一步决定了后续可选标签的语义范围。"
-    },
-    "step2": {
-      "title": "确定类别（Category）",
-      "desc": "在主体下进一步选择子类别，例如人物下的发型、服装、姿势、表情。子类别帮助你系统化地构建提示词的各个维度。"
-    },
-    "step3": {
-      "title": "挑选标签并生成（Tags）",
-      "desc": "点击标签即可插入到提示词框，再次点击取消。右侧面板实时显示拼接结果，可一键复制、追加光效与画质增强词，或附加负面词后导出。"
-    }
-  },
-  "Terminology": {
-    "title": "AI 提示词术语",
-    "prompt": "提示词。用自然语言描述你想生成的图像内容，是文生图模型的核心输入。",
-    "negative": "负面提示词。列出你不希望出现在图像中的元素，例如 lowres、blurry、bad hands、watermark，用于提升生成质量。",
-    "weight": "权重。通过括号或数值调整关键词的强弱，例如 (masterpiece:1.2) 会让该词在生成中更具影响力，数值越大影响越强。",
-    "sampler": "采样器。决定模型从噪声到图像的采样路径，常见的有 DPM++ 2M Karras、Euler a、UniPC 等，不同采样器影响速度和细节。",
-    "seed": "种子。控制生成的随机初始状态，固定 seed 且其他参数不变时，同一条 prompt 可复现出相同的图像，便于调试和微调。",
-    "cfg": "CFG Scale（无分类器引导系数）。数值越高模型越严格遵循你的 prompt，典型取值 7–12，过高会导致过拟合、画面僵硬。",
-    "style": "画风。描述整体艺术风格的关键词，例如 anime、photorealistic、oil painting、cyberpunk，通常放在 prompt 靠前位置。"
+    "h1": "IMGPrompt · 免费可视化提示词词典",
+    "tagline": "点选中英双语标签，秒出 AI 图像/视频专业提示词 —— 支持 Midjourney、FLUX、Nano Banana、Veo、Kling 等模型。"
   },
   "FAQ": {
     "title": "常见问题",
@@ -125,6 +95,35 @@
     "q6": {
       "question": "权重（Weight）怎么调？为什么有时看到括号 ()？",
       "answer": "在 Stable Diffusion WebUI 语法中，用 (word) 会让该词权重变为 1.1，((word)) 为 1.21，依此类推；也可以直接写 (word:1.3) 精确指定。Midjourney 使用 ::2 语法表达权重。工具导出的 prompt 保留原始英文，便于你按目标模型的规则手动微调权重。"
+    },
+    "q7": {
+      "question": "IMGPrompt 跟 PromptHero、Lexica、PromptBase 有什么区别？",
+      "answer": "IMGPrompt 是「点选构建」工具，不是 prompt 搜索引擎。PromptHero、Lexica、PromptBase 让你浏览或购买别人写好的 prompt；IMGPrompt 让你通过点击中英双语标签自己组合。同时 IMGPrompt 完全在浏览器本地运行，无需登录、不上传任何数据；上述平台都要求注册并追踪使用记录。"
+    },
+    "q8": {
+      "question": "IMGPrompt 支持 AI 视频模型 Veo、Kling、Runway 吗？",
+      "answer": "支持。IMGPrompt 不仅适配 Midjourney、FLUX、Nano Banana 等图像模型，也支持 Google Veo、Kling、Seedance、Runway、Hailuo 等视频模型。多数同类站点只覆盖图像模型，IMGPrompt 是少数同时免费支持新一代 AI 视频生成的工具之一。"
+    },
+    "q9": {
+      "question": "不会英文也能用 IMGPrompt 吗？",
+      "answer": "可以。界面共 18 种语言，每个标签同时显示英文和你的母语标签。用母语点选，IMGPrompt 自动用英文（AI 图像和视频模型实际需要的语言）组合 prompt。右侧「翻译」按钮还能一键把母语句子转成英文 prompt。"
     }
+  },
+  "Schema": {
+    "featureList": [
+      "完全免费 + 开源（MIT），无需登录",
+      "图像模型：Midjourney、FLUX、Nano Banana、GPT-image-2、Stable Diffusion、DALL·E",
+      "视频模型：Veo、Kling、Runway、Hailuo、Seedance",
+      "18 种语言界面 + 中英双语标签，无需英文基础",
+      "点选式标签组合提示词",
+      "内置光线与画质增强预设",
+      "精选负面提示词库",
+      "一键翻译为英文",
+      "智能标签推荐",
+      "实时 380 字符计数",
+      "完全本地运行 — 不上传、不追踪",
+      "GitHub 开源",
+      "Windows / macOS / Linux 桌面客户端"
+    ]
   }
 }

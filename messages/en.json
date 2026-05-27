@@ -1,9 +1,9 @@
 {
   "Metadata": {
-    "title": "IMGPrompt - AI Art Prompt Generator | Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling",
-    "description": "Create pro AI image & video prompts in seconds. Visual tag builder for Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling. Free, local, no login required.",
-    "ogTitle": "IMGPrompt - Generate AI Art Prompts in One Click",
-    "ogDescription": "Stop cramming prompts! Click bilingual tags to build pro prompts for AI image & video — Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling. Free, local, no login.",
+    "title": "IMGPrompt — Free Visual Prompt Builder (Midjourney, FLUX, Veo)",
+    "description": "Free open-source visual prompt builder for Midjourney, FLUX, Nano Banana, Veo, Kling. Click bilingual tags — no login, runs in your browser.",
+    "ogTitle": "IMGPrompt — Free Visual Builder for AI Image & Video Prompts",
+    "ogDescription": "Click bilingual tags to build pro AI image and video prompts — Midjourney, FLUX, Nano Banana, Veo, Kling. Free, local, no login.",
     "ogUrl": "https://prompt.newzone.top/app/en",
     "ogSiteName": "IMGPrompt",
     "ogLogo": "https://prompt.newzone.top/app/logo.png",
@@ -67,38 +67,8 @@
     "placeholder": "Please leave a message, no login required (enter your email to receive reply notifications)"
   },
   "Home": {
-    "h1": "IMGPrompt · AI Art Prompt Generator",
-    "tagline": "Stop cramming prompts. Click visual tags to build pro prompts for AI image and video — Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling, and more."
-  },
-  "About": {
-    "title": "About IMGPrompt",
-    "intro1": "IMGPrompt is a free, open-source visual prompt builder for AI image and video models, including Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, and Kling (plus Stable Diffusion and DALL·E via compatible syntax). Through visual tag selection with bilingual (English + your language) labels, you can assemble high-quality English prompts without memorizing every keyword.",
-    "intro2": "The tool runs entirely in your browser — no backend database, no uploads of your creative work. No signup, no payment, and fully open-source for self-hosting or auditing. Desktop clients for Windows, macOS, and Linux are also available, with full offline capability."
-  },
-  "HowTo": {
-    "title": "Generate Professional Prompts in Three Steps",
-    "step1": {
-      "title": "Pick a Subject",
-      "desc": "Choose what you want to depict from the subject list — people, animals, landscapes, architecture, concept art, and so on. This scopes the tags available in the following steps."
-    },
-    "step2": {
-      "title": "Select a Category",
-      "desc": "Drill down into a sub-category under your subject, e.g. hairstyles, clothing, poses, or expressions under \"people\". Categories help you cover every dimension of your prompt systematically."
-    },
-    "step3": {
-      "title": "Choose Tags and Generate",
-      "desc": "Click a tag to insert it into the prompt box; click again to remove. The right panel assembles the result live — copy with one click, append lighting or quality boosters, or add negative prompts before exporting."
-    }
-  },
-  "Terminology": {
-    "title": "AI Prompt Terminology",
-    "prompt": "Prompt. A natural-language description of the image you want to generate — the core input for text-to-image models.",
-    "negative": "Negative Prompt. A list of elements you want to exclude from the image, such as lowres, blurry, bad hands, or watermark, used to improve output quality.",
-    "weight": "Weight. Adjusts keyword emphasis using parentheses or numeric values, e.g. (masterpiece:1.2) makes the word more influential; higher values mean stronger effect.",
-    "sampler": "Sampler. Determines the path the model takes from noise to image — common choices include DPM++ 2M Karras, Euler a, and UniPC, each with different speed and detail trade-offs.",
-    "seed": "Seed. Controls the random starting state; with a fixed seed and unchanged parameters, the same prompt reproduces the same image — useful for debugging and fine-tuning.",
-    "cfg": "CFG Scale (Classifier-Free Guidance). Higher values make the model follow your prompt more strictly; typical range is 7–12. Too high causes over-fitting and a stiff, posterized look.",
-    "style": "Style. Keywords describing overall artistic direction — anime, photorealistic, oil painting, cyberpunk — usually placed near the start of the prompt."
+    "h1": "IMGPrompt · Free Visual Prompt Builder",
+    "tagline": "Click bilingual tags to build pro prompts for AI image and video — Midjourney, FLUX, Nano Banana, Veo, Kling, and more."
   },
   "FAQ": {
     "title": "Frequently Asked Questions",
@@ -125,6 +95,35 @@
     "q6": {
       "question": "How do weights work? Why do I see parentheses in prompts?",
       "answer": "In Stable Diffusion WebUI syntax, (word) raises the weight to 1.1, ((word)) to 1.21, and so on; you can also write (word:1.3) to set it explicitly. Midjourney uses ::2 syntax for weights. IMGPrompt preserves the original English tokens so you can fine-tune weights per your target model's rules."
+    },
+    "q7": {
+      "question": "How is IMGPrompt different from PromptHero, Lexica, or PromptBase?",
+      "answer": "IMGPrompt is a click-to-build prompt composer, not a prompt search engine. PromptHero, Lexica, and PromptBase let you browse or buy other people's prompts; IMGPrompt lets you compose your own by clicking bilingual visual tags. It runs entirely in your browser with no login and no upload, while those platforms require accounts and track your activity."
+    },
+    "q8": {
+      "question": "Does IMGPrompt support AI video models like Veo, Kling, and Runway?",
+      "answer": "Yes. IMGPrompt builds prompts for video models including Google Veo, Kling, Seedance, Runway, and Hailuo, alongside image models. Most prompt sites focus on image models only, so IMGPrompt is one of the few free tools that covers the new wave of AI video generation."
+    },
+    "q9": {
+      "question": "Can I use IMGPrompt without speaking English?",
+      "answer": "Yes. The UI is available in 18 languages, and every tag shows both English and your local-language label. You click tags in your language; IMGPrompt assembles the prompt in English (which AI image and video models actually need). The Translate button also converts any sentence in your language into an English prompt in one click."
     }
+  },
+  "Schema": {
+    "featureList": [
+      "Free and open-source (MIT) — no login required",
+      "Image models: Midjourney, FLUX, Nano Banana, GPT-image-2, Stable Diffusion, DALL·E",
+      "Video models: Veo, Kling, Runway, Hailuo, Seedance",
+      "18-language UI with bilingual visual tags — no English fluency needed",
+      "Click-to-build tag-based prompt composition",
+      "Built-in lighting and quality presets",
+      "Curated negative-prompt library",
+      "One-click translation to English",
+      "Smart tag recommendations",
+      "Live 380-character counter",
+      "Fully local — no upload, no tracking",
+      "Open source on GitHub",
+      "Desktop apps for Windows, macOS, Linux"
+    ]
   }
 }

@@ -1,9 +1,9 @@
 {
   "Metadata": {
-    "title": "IMGPrompt - KI-Kunst-Prompt-Generator | Nano Banana/GPT-image-2/Midjourney/FLUX/Seedance/Veo/Kling",
-    "description": "Erstellen Sie KI-Prompts für Bild und Video in Sekunden. Kompatibel mit Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo und Kling. Visuelle Tags, lokale Ausführung, kein Login.",
-    "ogTitle": "IMGPrompt - KI-Kunst-Prompts mit einem Klick generieren",
-    "ogDescription": "Schluss mit Prompt-Pauken! Klicken Sie auf zweisprachige Tags für Profi-Prompts für KI-Bild und -Video — Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling. Kostenlos und lokal.",
+    "title": "IMGPrompt — Kostenloser visueller AI-Prompt-Builder",
+    "description": "Kostenloser Open-Source-Prompt-Builder für Midjourney, FLUX, Nano Banana, Veo, Kling. Zweisprachige Tags anklicken — kein Login, läuft im Browser.",
+    "ogTitle": "IMGPrompt — AI-Kunstprompts auf einen Klick",
+    "ogDescription": "Klicke zweisprachige Tags, um Profi-Prompts für Midjourney, FLUX, Nano Banana, Veo, Kling zu bauen. Kostenlos, lokal, Open Source.",
     "ogUrl": "https://prompt.newzone.top/app/de",
     "ogSiteName": "IMGPrompt",
     "ogLogo": "https://prompt.newzone.top/app/logo.png",
@@ -67,38 +67,8 @@
     "placeholder": "Bitte hinterlassen Sie eine Nachricht, kein Login erforderlich (geben Sie Ihre E-Mail-Adresse ein, um Antwortbenachrichtigungen zu erhalten)"
   },
   "Home": {
-    "h1": "IMGPrompt · KI-Kunst-Prompt-Generator",
-    "tagline": "Schluss mit Prompt-Pauken. Visuelle Tags anklicken und Profi-Prompts für KI-Bild und Video erzeugen — unterstützt Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo, Kling und mehr."
-  },
-  "About": {
-    "title": "Über IMGPrompt",
-    "intro1": "IMGPrompt ist ein kostenloser, quelloffener visueller Prompt-Builder für KI-Bild- und Videomodelle, einschließlich Nano Banana, GPT-image-2, Midjourney, FLUX, Seedance, Veo und Kling (auch kompatibel mit der Syntax von Stable Diffusion und DALL·E). Durch die visuelle Auswahl zweisprachiger (Englisch + Ihre Sprache) Tags können Sie hochwertige englische Prompts zusammenstellen, ohne jedes Schlüsselwort auswendig zu lernen.",
-    "intro2": "Das Werkzeug läuft vollständig in Ihrem Browser – keine Backend-Datenbank, keine Uploads Ihrer Werke. Keine Anmeldung, keine Zahlung, vollständig quelloffen für Self-Hosting oder Audit. Desktop-Clients für Windows, macOS und Linux sind ebenfalls verfügbar und unterstützen alle Funktionen offline."
-  },
-  "HowTo": {
-    "title": "Professionelle Prompts in drei Schritten erstellen",
-    "step1": {
-      "title": "Motiv (Subject) wählen",
-      "desc": "Wählen Sie aus der Motivliste links, was Sie darstellen möchten – Menschen, Tiere, Landschaften, Architektur, Konzeptkunst usw. Dieser Schritt legt den Umfang der Tags für die nachfolgenden Schritte fest."
-    },
-    "step2": {
-      "title": "Kategorie (Category) auswählen",
-      "desc": "Gehen Sie in eine Unterkategorie Ihres Motivs, z. B. Frisuren, Kleidung, Posen oder Ausdrücke unter „Menschen“. Kategorien helfen, jede Dimension Ihres Prompts systematisch abzudecken."
-    },
-    "step3": {
-      "title": "Tags auswählen und generieren (Tags)",
-      "desc": "Klicken Sie auf ein Tag, um es in den Prompt einzufügen; erneut klicken zum Entfernen. Das rechte Panel setzt das Ergebnis live zusammen – mit einem Klick kopieren, Beleuchtung oder Qualitätsverstärker anhängen oder negative Prompts vor dem Export hinzufügen."
-    }
-  },
-  "Terminology": {
-    "title": "KI-Prompt-Terminologie",
-    "prompt": "Prompt. Eine Beschreibung in natürlicher Sprache des zu erzeugenden Bildes – die zentrale Eingabe für Text-zu-Bild-Modelle.",
-    "negative": "Negative Prompt. Liste von Elementen, die nicht im Bild erscheinen sollen (lowres, blurry, bad hands, watermark usw.), um die Qualität zu verbessern.",
-    "weight": "Weight (Gewicht). Steuert die Betonung eines Schlüsselworts per Klammern oder Zahlen, z. B. (masterpiece:1.2) verstärkt den Einfluss; höhere Werte bedeuten stärkere Wirkung.",
-    "sampler": "Sampler. Bestimmt den Weg des Modells vom Rauschen zum Bild. Gängige Auswahl: DPM++ 2M Karras, Euler a, UniPC; sie unterscheiden sich in Geschwindigkeit und Detail.",
-    "seed": "Seed. Steuert den zufälligen Startzustand; mit fixer Seed und unveränderten Parametern reproduziert derselbe Prompt dasselbe Bild – nützlich zum Debuggen und Feinjustieren.",
-    "cfg": "CFG Scale (Classifier-Free Guidance). Höhere Werte lassen das Modell den Prompt strenger befolgen. Typischer Bereich 7–12; zu hoch führt zu Überanpassung und starrem Bild.",
-    "style": "Style (Stil). Schlüsselwörter zur künstlerischen Ausrichtung – anime, photorealistic, oil painting, cyberpunk – meist am Anfang des Prompts platziert."
+    "h1": "IMGPrompt · Kostenloser visueller Prompt-Builder",
+    "tagline": "Klicke zweisprachige Tags, um Profi-Prompts für KI-Bild und -Video zu bauen — Midjourney, FLUX, Nano Banana, Veo, Kling und mehr."
   },
   "FAQ": {
     "title": "Häufig gestellte Fragen",
@@ -125,6 +95,35 @@
     "q6": {
       "question": "Wie funktionieren Gewichte? Warum sieht man Klammern in Prompts?",
       "answer": "In der Stable-Diffusion-WebUI-Syntax erhöht (word) das Gewicht auf 1.1, ((word)) auf 1.21 usw.; Sie können auch (word:1.3) explizit schreiben. Midjourney verwendet die ::2-Syntax. IMGPrompt bewahrt die ursprünglichen englischen Tokens, damit Sie die Gewichte nach den Regeln Ihres Zielmodells anpassen können."
+    },
+    "q7": {
+      "question": "Wie unterscheidet sich IMGPrompt von PromptHero, Lexica oder PromptBase?",
+      "answer": "IMGPrompt ist ein Click-to-Build-Prompt-Composer, keine Prompt-Suchmaschine. PromptHero, Lexica und PromptBase ermöglichen das Durchsuchen oder Kaufen fremder Prompts; IMGPrompt baut deinen eigenen Prompt durch Klicken zweisprachiger visueller Tags. Es läuft komplett im Browser ohne Login und ohne Upload, während diese Plattformen Konten verlangen und deine Aktivität verfolgen."
+    },
+    "q8": {
+      "question": "Unterstützt IMGPrompt KI-Videomodelle wie Veo, Kling und Runway?",
+      "answer": "Ja. IMGPrompt erstellt Prompts für Videomodelle wie Google Veo, Kling, Seedance, Runway und Hailuo, zusätzlich zu Bildmodellen. Die meisten Prompt-Seiten konzentrieren sich nur auf Bildmodelle, daher ist IMGPrompt eines der wenigen kostenlosen Tools, die auch die neue Welle der KI-Videogenerierung abdeckt."
+    },
+    "q9": {
+      "question": "Kann ich IMGPrompt ohne Englischkenntnisse nutzen?",
+      "answer": "Ja. Die UI ist in 18 Sprachen verfügbar, und jeder Tag zeigt sowohl Englisch als auch deine Landessprache. Du klickst in deiner Sprache; IMGPrompt baut den Prompt auf Englisch zusammen (was KI-Bild- und Videomodelle tatsächlich brauchen). Der Übersetzen-Button wandelt auch jeden Satz deiner Sprache mit einem Klick in einen englischen Prompt um."
     }
+  },
+  "Schema": {
+    "featureList": [
+      "Kostenlos & Open Source (MIT) — kein Login nötig",
+      "Bildmodelle: Midjourney, FLUX, Nano Banana, GPT-image-2, Stable Diffusion, DALL·E",
+      "Videomodelle: Veo, Kling, Runway, Hailuo, Seedance",
+      "18-sprachige UI mit zweisprachigen visuellen Tags — keine Englischkenntnisse nötig",
+      "Tagbasierte Prompt-Komposition per Klick",
+      "Eingebaute Licht- und Qualitäts-Presets",
+      "Kuratierte Negativprompt-Bibliothek",
+      "Ein-Klick-Übersetzung ins Englische",
+      "Intelligente Tag-Empfehlungen",
+      "Live-Zähler bis 380 Zeichen",
+      "Vollständig lokal — kein Upload, kein Tracking",
+      "Open Source auf GitHub",
+      "Desktop-Apps für Windows, macOS, Linux"
+    ]
   }
 }
