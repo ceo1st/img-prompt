@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
-// Redirect the user to the default locale when `/` is requested
+// Fallback for unmatched routes — go to the default locale.
 export default function RootNotFound() {
-  redirect("/zh");
+  redirect(`/${routing.defaultLocale}`);
 }
