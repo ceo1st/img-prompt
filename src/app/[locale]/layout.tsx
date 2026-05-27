@@ -81,35 +81,12 @@ export default async function LocaleLayout({ children, params }: Props) {
   // Enable static rendering
   setRequestLocale(locale);
   const direction = getLangDir(locale);
-  const [messages, t] = await Promise.all([getMessages(), getTranslations({ locale, namespace: "Metadata" })]);
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        url: t("ogUrl"),
-        logo: t("ogLogo"),
-        name: t("ogSiteName"),
-      },
-      {
-        "@type": "WebSite",
-        url: t("ogUrl"),
-        name: t("ogSiteName"),
-        publisher: {
-          "@type": "Organization",
-          name: t("ogSiteName"),
-          logo: t("ogLogo"),
-        },
-      },
-    ],
-  };
+  const messages = await getMessages();
 
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body>
         <AntdRegistry>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
           <NextIntlClientProvider messages={messages}>
             <ThemesProvider>
               <Navigation />
