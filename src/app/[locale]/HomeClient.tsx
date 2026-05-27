@@ -144,10 +144,15 @@ const HomeClient: FC<HomeClientProps> = ({ tagsData }) => {
     [combinedTagsData, activeObject, activeAttribute],
   );
 
+  const selectedNameSet = useMemo(
+    () => new Set(selectedTags.map((t) => t.displayName)),
+    [selectedTags],
+  );
+
   const tagSectionContent = useColorBlocks ? (
-    <TagSectionMulticolor tags={filteredTags} selectedTags={selectedTags} onTagClick={handleTagClick} />
+    <TagSectionMulticolor tags={filteredTags} selectedNameSet={selectedNameSet} onTagClick={handleTagClick} />
   ) : (
-    <TagSection tags={filteredTags} selectedTags={selectedTags} onTagClick={handleTagClick} />
+    <TagSection tags={filteredTags} selectedNameSet={selectedNameSet} onTagClick={handleTagClick} />
   );
 
   return (
