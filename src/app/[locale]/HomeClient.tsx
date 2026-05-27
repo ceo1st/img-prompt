@@ -211,7 +211,7 @@ const HomeClient: FC<HomeClientProps> = ({ tagsData }) => {
           )}
         </Col>
         <Col xs={24} lg={6}>
-          <ResultSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} tagsData={combinedTagsData} />
+          <ResultSection selectedTags={selectedTags} setSelectedTags={setSelectedTags} firstChunk={combinedTagsData} />
         </Col>
       </Row>
     </>

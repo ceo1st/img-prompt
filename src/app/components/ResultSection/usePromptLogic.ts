@@ -5,97 +5,72 @@ import { TagItem } from "../types";
 import { normalizeString } from "@/app/utils/normalizeString";
 import { translateText } from "@/app/utils/translateAPI";
 import { colorArray } from "@/app/data/constants";
+import { useFullTagsData } from "@/app/hooks/useFullTagsData";
 
-// Helper for translation normalization
 const normalizeForTranslation = (text: string) => text.trim().replace(/[,，]\s*$/, "");
 const getRandomColor = () => colorArray[Math.floor(Math.random() * colorArray.length)];
 
 interface UsePromptLogicProps {
   selectedTags: TagItem[];
   setSelectedTags: (tags: TagItem[]) => void;
-  tagsData: TagItem[];
+  firstChunk: TagItem[];
 }
 
-export function usePromptLogic({ selectedTags, setSelectedTags, tagsData }: UsePromptLogicProps) {
+export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: UsePromptLogicProps) {
   const { message } = App.useApp();
   const t = useTranslations("ResultSection");
   const locale = useLocale();
 
-  const [resultText, setResultText] = useState("");
+  const { searchIndex, findTagData, ensureLoaded } = useFullTagsData(locale, firstChunk);
+
+  const [draftText, setDraftText] = useState<string | null>(null);
+  // isComposing state is consumed only via its setter (handleBlur resets it; onCompositionStart/End drive it)
+  const [, setIsComposing] = useState(false);
   const [translatedText, setTranslatedText] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<TagItem[]>([]);
   const [exactMatchTag, setExactMatchTag] = useState<TagItem | null>(null);
-  const [isComposing, setIsComposing] = useState(false);
-  const lastTranslatedSource = useRef<string>("");
+  const [inputText, setInputText] = useState("");
+  const lastTranslatedSource = useRef("");
 
-  // Tag Search Logic
-  const findTagData = useMemo(() => {
-    const tagMap = new Map(tagsData.map((tag) => [normalizeString(tag.displayName || ""), tag]));
-
-    return (displayName: string) => {
-      const normalizedDisplayName = normalizeString(displayName);
-      let foundTag = tagMap.get(normalizedDisplayName);
-
-      if (!foundTag) {
-        const modifiedDisplayName = normalizedDisplayName.replace(/ /g, "_");
-        foundTag = tagMap.get(modifiedDisplayName);
-      }
-
-      return (
-        foundTag || {
-          object: "",
-          attribute: "",
-          langName: "",
-          displayName: "",
-        }
-      );
-    };
-  }, [tagsData]);
-
-  // Sync selectedTags to resultText (when tags change externally or via click)
-  useEffect(() => {
-    if (!isComposing && selectedTags.length > 0) {
-      const newText = selectedTags
+  const committedText = useMemo(
+    () =>
+      selectedTags
         .map((tag) => tag.displayName)
         .filter(Boolean)
-        .join(", ");
-      setResultText(newText);
-    } else if (selectedTags.length === 0) {
-      setResultText("");
-    }
-  }, [selectedTags, isComposing]);
+        .join(", "),
+    [selectedTags],
+  );
+  const displayedText = draftText ?? committedText;
 
-  // Auto Translate Logic (Debounced + canceled-flag race protection + sync clear)
+  // External selectedTags change clears draft (React 19 adjust-state-on-prop-change)
+  const [prevSelectedTags, setPrevSelectedTags] = useState(selectedTags);
+  if (prevSelectedTags !== selectedTags) {
+    setPrevSelectedTags(selectedTags);
+    setDraftText(null);
+  }
+
+  // Translation: debounced 1500ms, depends on displayedText + locale
   useEffect(() => {
-    const normalizedText = normalizeForTranslation(resultText);
-
-    // d) sync clear: 文本空了立即清空翻译，不等 debounce
+    const normalizedText = normalizeForTranslation(displayedText);
     if (!normalizedText) {
       setTranslatedText("");
       lastTranslatedSource.current = "";
       return;
     }
-
     if (normalizedText === lastTranslatedSource.current) return;
-
     if (locale === "en") {
-      setTranslatedText(resultText);
+      setTranslatedText(displayedText);
       return;
     }
-
-    let canceled = false; // b) race protection
-
-    // a) debounce 5000 → 1500
-    const timeoutId = setTimeout(async () => {
+    let canceled = false;
+    const timer = setTimeout(async () => {
       try {
         setIsTranslating(true);
-        // sourceLanguage="auto" 让翻译 API 自检测（与手动翻译按钮逻辑一致）
-        // 否则用户在 prompt 里输日/韩/中等非英文，硬指定 source="en" 会导致 API 返回原文
-        const translated = await translateText(resultText, "auto", locale);
+        const translated = await translateText(displayedText, "auto", locale);
         if (canceled) return;
         setTranslatedText(translated);
-        lastTranslatedSource.current = normalizeForTranslation(resultText);
+        lastTranslatedSource.current = normalizeForTranslation(displayedText);
       } catch (error) {
         if (canceled) return;
         console.warn("自动翻译失败:", error);
@@ -104,177 +79,166 @@ export function usePromptLogic({ selectedTags, setSelectedTags, tagsData }: UseP
         if (!canceled) setIsTranslating(false);
       }
     }, 1500);
-
     return () => {
       canceled = true;
-      clearTimeout(timeoutId);
+      clearTimeout(timer);
     };
-  }, [resultText, locale]);
+  }, [displayedText, locale]);
 
-  // Tag Suggestion Logic
+  // Recommendation: debounced 150ms, depends on displayedText + searchIndex
   useEffect(() => {
-    const lastTagName = normalizeString(resultText.split(", ").pop()?.trim() || "");
-    if (!lastTagName) {
-      setSuggestedTags([]);
-      setExactMatchTag(null);
-      return;
-    }
-    if (exactMatchTag) {
-      setExactMatchTag(null);
-    }
-
-    const getRecommendedTags = (searchField: keyof TagItem) =>
-      tagsData
-        .filter((tag) => {
-          const normalizedField = normalizeString((tag[searchField] as string) || "");
-          if (normalizedField === lastTagName) {
-            setExactMatchTag(tag);
-            return false;
-          }
-          return normalizedField.includes(lastTagName);
-        })
-        .sort((a, b) => {
-          const aNormalized = normalizeString((a[searchField] as string) || "");
-          const bNormalized = normalizeString((b[searchField] as string) || "");
-          const aStartsWithTag = aNormalized.startsWith(lastTagName);
-          const bStartsWithTag = bNormalized.startsWith(lastTagName);
-
-          if (aStartsWithTag !== bStartsWithTag) {
-            return aStartsWithTag ? -1 : 1;
-          }
-          return aNormalized.localeCompare(bNormalized);
-        });
-
-    let recommendedTags = getRecommendedTags("displayName");
-    if (recommendedTags.length === 0) {
-      recommendedTags = getRecommendedTags("langName");
-    }
-
-    setSuggestedTags(recommendedTags.slice(0, 10));
-  }, [resultText, tagsData, exactMatchTag]);
-
-  // Handlers
-  const handleResultTextChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      let newText = e.target.value;
-      if (newText.endsWith(",") || newText.endsWith("，")) {
-        newText = newText.slice(0, -1).replace(/,\s*$/g, "") + ", ";
-        setResultText(newText);
+    const timer = setTimeout(() => {
+      const lastTagName = normalizeString(displayedText.split(", ").pop()?.trim() || "");
+      if (!lastTagName) {
+        setSuggestedTags([]);
+        setExactMatchTag(null);
+        return;
+      }
+      if (!searchIndex) {
+        // Full data not loaded yet — skip; will retrigger when fullTags arrives
+        setSuggestedTags([]);
+        setExactMatchTag(null);
         return;
       }
 
-      setResultText(newText);
+      // Candidates: prefix-bucket if length >= 2; else full scan (rare)
+      let candidates: TagItem[];
+      if (lastTagName.length >= 2) {
+        candidates = searchIndex.get(lastTagName.slice(0, 2)) ?? [];
+      } else {
+        const all: TagItem[] = [];
+        for (const arr of searchIndex.values()) for (const tag of arr) all.push(tag);
+        candidates = all;
+      }
 
-      const newSelectedTags = newText
-        .split(", ")
-        .filter((displayName) => displayName?.trim())
-        .map((displayName) => ({
-          ...findTagData(displayName),
-          displayName,
-        }));
+      const computeMatches = (searchField: keyof TagItem) => {
+        let exact: TagItem | null = null;
+        const matches = candidates.filter((tag) => {
+          const normalizedField = normalizeString((tag[searchField] as string) || "");
+          if (normalizedField === lastTagName) {
+            exact = tag;
+            return false;
+          }
+          return normalizedField.includes(lastTagName);
+        });
+        matches.sort((a, b) => {
+          const aN = normalizeString((a[searchField] as string) || "");
+          const bN = normalizeString((b[searchField] as string) || "");
+          const aS = aN.startsWith(lastTagName);
+          const bS = bN.startsWith(lastTagName);
+          if (aS !== bS) return aS ? -1 : 1;
+          return aN.localeCompare(bN);
+        });
+        return { exact, matches };
+      };
 
-      setSelectedTags(newSelectedTags);
-    },
-    [findTagData, setSelectedTags],
-  );
+      let { exact, matches } = computeMatches("displayName");
+      if (matches.length === 0 && !exact) {
+        ({ exact, matches } = computeMatches("langName"));
+      }
+      setExactMatchTag(exact);
+      setSuggestedTags(matches.slice(0, 10));
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [displayedText, searchIndex]);
+
+  // Handlers — draft text is the editing buffer
+
+  const handleResultTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    let newText = e.target.value;
+    // Keep the trailing-comma normalization behavior from the original
+    if (newText.endsWith(",") || newText.endsWith("，")) {
+      newText = newText.slice(0, -1).replace(/,\s*$/g, "") + ", ";
+    }
+    setDraftText(newText);
+  }, []);
 
   const handleBlur = useCallback(() => {
-    const replacedText = resultText
+    const currentText = draftText ?? committedText;
+    const replacedText = currentText
       .replace(/，/g, ", ")
       .replace(/\s+,\s*/g, ", ")
       .replace(/\s+/g, " ");
-
     const displayNames = replacedText.split(", ").filter((name) => name.trim() !== "");
-    const uniqueDisplayNames = Array.from(new Set(displayNames.map((displayName) => normalizeString(displayName))));
-
-    const selectedTags = uniqueDisplayNames.map((displayName) => {
+    const uniqueDisplayNames = Array.from(new Set(displayNames.map((d) => normalizeString(d))));
+    const parsed = uniqueDisplayNames.map((displayName) => {
       const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
-      return {
-        object,
-        displayName: foundDisplayName || displayName,
-        attribute,
-        langName,
-      };
+      return { object, displayName: foundDisplayName || displayName, attribute, langName };
     });
-
-    setSelectedTags(selectedTags);
-    setResultText(selectedTags.map((tag) => tag.displayName).join(", "));
+    setSelectedTags(parsed);
+    setDraftText(null);
     setIsComposing(false);
-  }, [resultText, findTagData, setSelectedTags]);
+  }, [draftText, committedText, findTagData, setSelectedTags]);
 
   const handleSuggestTagClick = useCallback(
     (tag: TagItem) => {
-      // Note: accessing selectedTags directly here might be stale if strict mode, but usually fine in event handler if deps correct.
-      // However, since we need proper accumulated tags, we should probably rely on proper state update patterns or refs if needed.
-      // For now, mirroring original logic which used state directly.
-
-      // We need to use the functional update or the prop
-      // But since selectedTags is passed in, we depend on it.
-
-      const newSelectedTags = [...selectedTags];
-      if (newSelectedTags.length > 0) {
-        newSelectedTags[newSelectedTags.length - 1] = tag;
+      const baseText = draftText ?? committedText;
+      const displayNames = baseText.split(", ").filter((s) => s.trim());
+      const parsed = displayNames.map((displayName) => {
+        const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
+        return { object, displayName: foundDisplayName || displayName, attribute, langName };
+      });
+      if (parsed.length > 0) {
+        parsed[parsed.length - 1] = tag;
       } else {
-        newSelectedTags.push(tag);
+        parsed.push(tag);
       }
-
-      setSelectedTags(newSelectedTags);
-      setResultText(newSelectedTags.map((t) => t.displayName).join(", "));
+      setSelectedTags(parsed);
+      // draftText cleared by the in-render prev-check when selectedTags identity changes
     },
-    [selectedTags, setSelectedTags],
+    [draftText, committedText, findTagData, setSelectedTags],
   );
 
   const handleConstantText = useCallback(
     (constantText: string, successMessageKey: string) => {
-      const newText = resultText ? resultText + ", " + constantText : constantText;
+      const baseText = draftText ?? committedText;
+      const newText = baseText ? baseText + ", " + constantText : constantText;
       const displayNames = newText.split(", ").filter(Boolean);
       const uniqueDisplayNames = Array.from(new Set(displayNames));
-
       const newSelectedTags = uniqueDisplayNames.map((displayName) => {
         const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
-        return {
-          object,
-          displayName: foundDisplayName || displayName,
-          attribute,
-          langName,
-        };
+        return { object, displayName: foundDisplayName || displayName, attribute, langName };
       });
-
       setSelectedTags(newSelectedTags);
-      setResultText(uniqueDisplayNames.join(", "));
       message.success(t(successMessageKey));
     },
-    [resultText, findTagData, setSelectedTags, message, t],
+    [draftText, committedText, findTagData, setSelectedTags, message, t],
   );
 
   const handleClear = useCallback(() => {
     setSelectedTags([]);
-    setResultText("");
     message.success(t("clearSuccess"));
   }, [setSelectedTags, message, t]);
 
   const handleColorReplace = useCallback(() => {
-    let updatedText = resultText;
+    const currentText = draftText ?? committedText;
     const combinedColorRegex = new RegExp(`\\b(${colorArray.join("|")})\\b`, "gi");
-    const matches = updatedText.match(combinedColorRegex);
-    if (matches && matches.length > 0) {
-      updatedText = updatedText.replace(combinedColorRegex, () => getRandomColor());
-      setResultText(updatedText);
-      message.success(t("randomColor-success", { count: matches.length }));
-    } else {
+    const matches = currentText.match(combinedColorRegex);
+    if (!matches || matches.length === 0) {
       message.info(t("randomColor-noMatch"));
+      return;
     }
-  }, [resultText, message, t]);
-
-  // Manual Translate Logic
-  const [inputText, setInputText] = useState("");
+    // Reparse + commit immediately so the random colors persist across tag clicks
+    // (without this, draftText holds the new colors until any external selectedTags
+    // change clears the draft — losing the color randomization).
+    const updatedText = currentText.replace(combinedColorRegex, () => getRandomColor());
+    const replacedText = updatedText.replace(/，/g, ", ").replace(/\s+,\s*/g, ", ").replace(/\s+/g, " ");
+    const displayNames = replacedText.split(", ").filter((name) => name.trim() !== "");
+    const uniqueDisplayNames = Array.from(new Set(displayNames.map((d) => normalizeString(d))));
+    const parsed = uniqueDisplayNames.map((displayName) => {
+      const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
+      return { object, displayName: foundDisplayName || displayName, attribute, langName };
+    });
+    setSelectedTags(parsed);
+    message.success(t("randomColor-success", { count: matches.length }));
+  }, [draftText, committedText, findTagData, setSelectedTags, message, t]);
 
   const handleTranslate = useCallback(async () => {
     try {
       setIsTranslating(true);
-      const translatedText = await translateText(inputText, "auto", "en");
-      if (translatedText.trim()) {
-        handleConstantText(translatedText, "translateSuccess");
+      const translated = await translateText(inputText, "auto", "en");
+      if (translated.trim()) {
+        handleConstantText(translated, "translateSuccess");
         setInputText("");
       } else {
         message.error(t("translateEmptyError"));
@@ -287,13 +251,11 @@ export function usePromptLogic({ selectedTags, setSelectedTags, tagsData }: UseP
   }, [inputText, t, handleConstantText, message]);
 
   return {
-    resultText,
-    setResultText,
+    resultText: displayedText,
     translatedText,
     isTranslating,
     suggestedTags,
     exactMatchTag,
-    isComposing,
     setIsComposing,
     handleResultTextChange,
     handleBlur,
@@ -301,6 +263,7 @@ export function usePromptLogic({ selectedTags, setSelectedTags, tagsData }: UseP
     handleConstantText,
     handleClear,
     handleColorReplace,
+    handleFocus: ensureLoaded,
     t,
     inputText,
     setInputText,

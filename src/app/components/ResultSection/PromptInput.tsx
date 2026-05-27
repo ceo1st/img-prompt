@@ -1,12 +1,15 @@
-import { FC } from "react";
-import { Input, Button, Flex, Tooltip, Typography } from "antd";
+import { FC, ReactNode } from "react";
+import { Input, Button, Flex, Tooltip, Typography, Divider } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 interface TemplateAction {
   key: string;
-  label: string;
+  label?: string;
+  icon?: ReactNode;
   tooltip?: string;
+  ariaLabel?: string;
   onClick: () => void;
 }
 
@@ -14,6 +17,7 @@ interface PromptInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onBlur: () => void;
+  onFocus?: () => void;
   onCompositionStart: () => void;
   onCompositionEnd: () => void;
   onCopy: () => void;
@@ -27,6 +31,7 @@ export const PromptInput: FC<PromptInputProps> = ({
   value,
   onChange,
   onBlur,
+  onFocus,
   onCompositionStart,
   onCompositionEnd,
   onCopy,
@@ -41,6 +46,7 @@ export const PromptInput: FC<PromptInputProps> = ({
         value={value}
         onChange={onChange}
         onBlur={onBlur}
+        onFocus={onFocus}
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd}
         autoSize={{ minRows: 6, maxRows: 14 }}
@@ -57,7 +63,12 @@ export const PromptInput: FC<PromptInputProps> = ({
           )}
           {templateActions.map((action) => {
             const btn = (
-              <Button key={action.key} size="small" onClick={action.onClick}>
+              <Button
+                key={action.key}
+                size="small"
+                icon={action.icon}
+                onClick={action.onClick}
+                aria-label={action.ariaLabel}>
                 {action.label}
               </Button>
             );
@@ -70,28 +81,28 @@ export const PromptInput: FC<PromptInputProps> = ({
             );
           })}
         </Flex>
-        <Flex gap={8}>
+        <Flex gap={8} wrap align="center">
           <Button size="small" onClick={onClear}>
             {t("button-clear")}
           </Button>
+          <Divider orientation="vertical" style={{ height: 18, margin: 0, borderInlineStartColor: "var(--ant-color-border)" }} />
+          {negativeAction &&
+            (negativeAction.tooltip ? (
+              <Tooltip title={negativeAction.tooltip}>
+                <Button size="small" icon={<CopyOutlined />} onClick={negativeAction.onClick}>
+                  {negativeAction.label}
+                </Button>
+              </Tooltip>
+            ) : (
+              <Button size="small" icon={<CopyOutlined />} onClick={negativeAction.onClick}>
+                {negativeAction.label}
+              </Button>
+            ))}
           <Button size="small" type="primary" onClick={onCopy}>
             {t("button-copy")}
           </Button>
         </Flex>
       </Flex>
-
-      {negativeAction &&
-        (negativeAction.tooltip ? (
-          <Tooltip title={negativeAction.tooltip}>
-            <Button size="small" block onClick={negativeAction.onClick}>
-              {negativeAction.label}
-            </Button>
-          </Tooltip>
-        ) : (
-          <Button size="small" block onClick={negativeAction.onClick}>
-            {negativeAction.label}
-          </Button>
-        ))}
     </>
   );
 };

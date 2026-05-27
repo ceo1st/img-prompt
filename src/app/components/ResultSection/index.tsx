@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Button, Input, Tooltip, Flex, Card, Space } from "antd";
+import { Button, Input, Card, Space } from "antd";
 import { BgColorsOutlined } from "@ant-design/icons";
 import { useLocale } from "next-intl";
 import { CONSTANT_BUTTONS, NEGATIVE_TEXT } from "@/app/data/constants";
@@ -13,7 +13,7 @@ import { TranslationResult } from "./TranslationResult";
 interface ResultSectionProps {
   selectedTags: TagItem[];
   setSelectedTags: (tags: TagItem[]) => void;
-  tagsData: TagItem[];
+  firstChunk: TagItem[];
 }
 
 const PromptResults: FC<ResultSectionProps> = (props) => {
@@ -29,6 +29,7 @@ const PromptResults: FC<ResultSectionProps> = (props) => {
     setIsComposing,
     handleResultTextChange,
     handleBlur,
+    handleFocus,
     handleSuggestTagClick,
     handleConstantText,
     handleClear,
@@ -39,12 +40,21 @@ const PromptResults: FC<ResultSectionProps> = (props) => {
     handleTranslate,
   } = usePromptLogic(props);
 
-  const templateActions = CONSTANT_BUTTONS.map(({ text, tooltipKey, promptKey }) => ({
-    key: promptKey,
-    label: t(promptKey),
-    tooltip: t(tooltipKey),
-    onClick: () => handleConstantText(text, "insertSuccess"),
-  }));
+  const templateActions = [
+    ...CONSTANT_BUTTONS.map(({ text, tooltipKey, promptKey }) => ({
+      key: promptKey,
+      label: t(promptKey),
+      tooltip: t(tooltipKey),
+      onClick: () => handleConstantText(text, "insertSuccess"),
+    })),
+    {
+      key: "randomColor",
+      icon: <BgColorsOutlined />,
+      tooltip: t("tooltip-randomColor"),
+      ariaLabel: t("button-randomcolor"),
+      onClick: handleColorReplace,
+    },
+  ];
 
   const negativeAction = {
     key: "negative",
@@ -55,11 +65,11 @@ const PromptResults: FC<ResultSectionProps> = (props) => {
 
   return (
     <Card variant="outlined" styles={{ body: { padding: 16 } }}>
-      {/* Main Prompt Input + inline template actions + negative row */}
       <PromptInput
         value={resultText}
         onChange={handleResultTextChange}
         onBlur={handleBlur}
+        onFocus={handleFocus}
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
         onCopy={() => copyToClipboard(resultText, t("prompt"))}
@@ -69,30 +79,22 @@ const PromptResults: FC<ResultSectionProps> = (props) => {
         t={t}
       />
 
-      {/* Tag Suggestions */}
       <TagSuggestions suggestedTags={suggestedTags} exactMatchTag={exactMatchTag} onTagClick={handleSuggestTagClick} />
 
-      {/* Manual Translation Input + inline aux (Random Color) */}
-      <Flex gap={6} align="center" style={{ marginTop: 12 }}>
-        <Space.Compact size="small" style={{ flex: 1, minWidth: 0 }}>
-          <Input
-            value={inputText}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputText(e.target.value)}
-            onPressEnter={handleTranslate}
-            placeholder={t("tooltip-translate")}
-            aria-label={t("tooltip-translate")}
-            disabled={isTranslating}
-          />
-          <Button onClick={handleTranslate} loading={isTranslating}>
-            {t("button-translate")}
-          </Button>
-        </Space.Compact>
-        <Tooltip title={t("tooltip-randomColor")}>
-          <Button size="small" icon={<BgColorsOutlined />} onClick={handleColorReplace} aria-label={t("button-randomcolor")} />
-        </Tooltip>
-      </Flex>
+      <Space.Compact size="small" style={{ display: "flex", marginTop: 12 }}>
+        <Input
+          value={inputText}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputText(e.target.value)}
+          onPressEnter={handleTranslate}
+          placeholder={t("tooltip-translate")}
+          aria-label={t("tooltip-translate")}
+          disabled={isTranslating}
+        />
+        <Button onClick={handleTranslate} loading={isTranslating}>
+          {t("button-translate")}
+        </Button>
+      </Space.Compact>
 
-      {/* Logic-based Translation Result */}
       <TranslationResult translatedText={translatedText} isTranslating={isTranslating} isVisible={locale !== "en"} t={t} />
     </Card>
   );
