@@ -1,6 +1,6 @@
 {
   "name": "img-prompt",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
@@ -31,7 +31,7 @@
     "@types/rtl-detect": "^1.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
