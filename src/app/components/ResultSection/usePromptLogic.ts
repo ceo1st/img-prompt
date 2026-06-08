@@ -64,8 +64,10 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
       return;
     }
     let canceled = false;
+    let started = false;
     const timer = setTimeout(async () => {
       try {
+        started = true;
         setIsTranslating(true);
         const translated = await translateText(displayedText, "auto", locale);
         if (canceled) return;
@@ -82,6 +84,11 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
     return () => {
       canceled = true;
       clearTimeout(timer);
+      // This auto-translation already began but is now canceled; its `finally`
+      // is skipped (canceled), so clear the spinner here. Gated on `started` so
+      // we never touch the flag for a translation that never ran (avoids stomping
+      // the manual-translate flow, which shares isTranslating).
+      if (started) setIsTranslating(false);
     };
   }, [displayedText, locale]);
 
@@ -144,6 +151,21 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
 
   // Handlers — draft text is the editing buffer
 
+  // Re-deriving tags from the prompt text uses findTagData, which only sees the
+  // currently-loaded tag data. fullTags is lazy (loaded on textarea focus); until
+  // then only firstChunk = object 0 is searchable. Without this fallback, committing
+  // text (template insert / random color / blur) would resolve a tag picked from any
+  // other object to an empty record and silently drop its object/attribute/langName.
+  // Preserve the already-selected rich tag when findTagData can't resolve the name.
+  const resolveTagFromText = useCallback(
+    (rawName: string, prevByName: Map<string, TagItem>): TagItem => {
+      const found = findTagData(rawName);
+      if (found.displayName) return found;
+      return prevByName.get(normalizeString(rawName)) ?? { object: "", attribute: "", displayName: rawName, langName: "" };
+    },
+    [findTagData],
+  );
+
   const handleResultTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let newText = e.target.value;
     // Keep the trailing-comma normalization behavior from the original
@@ -161,14 +183,12 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
       .replace(/\s+/g, " ");
     const displayNames = replacedText.split(", ").filter((name) => name.trim() !== "");
     const uniqueDisplayNames = Array.from(new Set(displayNames.map((d) => normalizeString(d))));
-    const parsed = uniqueDisplayNames.map((displayName) => {
-      const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
-      return { object, displayName: foundDisplayName || displayName, attribute, langName };
-    });
+    const prevByName = new Map(selectedTags.map((tag) => [normalizeString(tag.displayName), tag]));
+    const parsed = uniqueDisplayNames.map((displayName) => resolveTagFromText(displayName, prevByName));
     setSelectedTags(parsed);
     setDraftText(null);
     setIsComposing(false);
-  }, [draftText, committedText, findTagData, setSelectedTags]);
+  }, [draftText, committedText, resolveTagFromText, selectedTags, setSelectedTags]);
 
   const handleSuggestTagClick = useCallback(
     (tag: TagItem) => {
@@ -195,14 +215,12 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
       const newText = baseText ? baseText + ", " + constantText : constantText;
       const displayNames = newText.split(", ").filter(Boolean);
       const uniqueDisplayNames = Array.from(new Set(displayNames));
-      const newSelectedTags = uniqueDisplayNames.map((displayName) => {
-        const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
-        return { object, displayName: foundDisplayName || displayName, attribute, langName };
-      });
+      const prevByName = new Map(selectedTags.map((tag) => [normalizeString(tag.displayName), tag]));
+      const newSelectedTags = uniqueDisplayNames.map((displayName) => resolveTagFromText(displayName, prevByName));
       setSelectedTags(newSelectedTags);
       message.success(t(successMessageKey));
     },
-    [draftText, committedText, findTagData, setSelectedTags, message, t],
+    [draftText, committedText, resolveTagFromText, selectedTags, setSelectedTags, message, t],
   );
 
   const handleClear = useCallback(() => {
@@ -225,13 +243,11 @@ export function usePromptLogic({ selectedTags, setSelectedTags, firstChunk }: Us
     const replacedText = updatedText.replace(/，/g, ", ").replace(/\s+,\s*/g, ", ").replace(/\s+/g, " ");
     const displayNames = replacedText.split(", ").filter((name) => name.trim() !== "");
     const uniqueDisplayNames = Array.from(new Set(displayNames.map((d) => normalizeString(d))));
-    const parsed = uniqueDisplayNames.map((displayName) => {
-      const { object, attribute, langName, displayName: foundDisplayName } = findTagData(displayName);
-      return { object, displayName: foundDisplayName || displayName, attribute, langName };
-    });
+    const prevByName = new Map(selectedTags.map((tag) => [normalizeString(tag.displayName), tag]));
+    const parsed = uniqueDisplayNames.map((displayName) => resolveTagFromText(displayName, prevByName));
     setSelectedTags(parsed);
     message.success(t("randomColor-success", { count: matches.length }));
-  }, [draftText, committedText, findTagData, setSelectedTags, message, t]);
+  }, [draftText, committedText, resolveTagFromText, selectedTags, setSelectedTags, message, t]);
 
   const handleTranslate = useCallback(async () => {
     try {
